@@ -41,12 +41,13 @@ class Server:
         else:
             print(f"Request failed with status code: {response.status_code}")
 
-    def get_agent(self,):
-        pass
-
     def get_ping_proxies(self):
         query = {}
         return self._get("/api/proxy/ping", query)
+
+    def get_speed_test_proxies(self):
+        query = {}
+        return self._get("/api/proxy/ping", query)  # todo
 
     def send_report(self, proxies):
         query = {}

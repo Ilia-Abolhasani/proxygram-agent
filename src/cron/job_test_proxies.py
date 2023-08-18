@@ -1,9 +1,8 @@
-from DotDict import DotDict
+from dot_dict import DotDict
 from config import Config
 
 
 def download_spped(telegram_api):
-    telegram_api.speed_test()
     result = telegram_api.get_message(
         Config.download_chat_id,
         Config.download_message_id)
@@ -14,8 +13,7 @@ def download_spped(telegram_api):
     return telegram_api.speed_test(file_id)
 
 
-def start(telegram_api, server, proxies, batch, speed_test):
-    result = telegram_api.remove_all_proxies()
+def _start(server, telegram_api, proxies, batch, speed_test):
     report_list = []
     for proxy in proxies:
         report = {"proxy_id": proxy.id}
@@ -41,3 +39,23 @@ def start(telegram_api, server, proxies, batch, speed_test):
             reports = []
     if (len(reports) > 0):
         server.send_report({"reports": reports})
+
+
+def start_ping(server, telegram_api):
+    result = telegram_api.remove_all_proxies()
+    proxies = server.get_ping_proxies()
+    _start(server,
+           telegram_api,
+           proxies,
+           Config.batch_size_ping,
+           False)
+
+
+def start_speed_text(server, telegram_api):
+    result = telegram_api.remove_all_proxies()
+    proxies = server.get_speed_test_proxies()
+    _start(server,
+           telegram_api,
+           proxies,
+           Config.batch_size_speed_test,
+           True)

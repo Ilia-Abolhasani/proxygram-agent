@@ -1,23 +1,46 @@
-from DotDict import DotDict
+from dot_dict import DotDict
 from timeout_decorator import timeout
 import time
 import telegram.client as client
 from config import Config
 import os
+config = Config()
 
 
-class TelegramAPI:
-    def __init__(self):
-        api_id = int(os.getenv("telegram_app_id"))
-        api_hash = os.getenv("telegram_app_hash")
-        phone = os.getenv("telegram_phone")
-        self.tg = client.Telegram(
-            api_id=api_id,
-            api_hash=api_hash,
-            phone=phone,
-            database_encryption_key='changekey123',
-            files_directory='../td-agent/'
-        )
+class Telegram:
+    def __init__(
+            self,
+            api_id,
+            api_hash,
+            phone,
+            database_encryption_key,
+            tdlib_directory,
+            proxy_server=None,
+            proxy_port=None,
+            proxy_secret=None
+    ):
+        if (proxy_server):
+            self.tg = client.Telegram(
+                api_id=api_id,
+                api_hash=api_hash,
+                phone=phone,
+                database_encryption_key=database_encryption_key,
+                files_directory=tdlib_directory,
+                proxy_server=proxy_server,
+                proxy_port=proxy_port,
+                proxy_type={
+                    '@type': 'proxyTypeMtproto',
+                    'secret': proxy_secret
+                }
+            )
+        else:
+            self.tg = client.Telegram(
+                api_id=api_id,
+                api_hash=api_hash,
+                phone=phone,
+                database_encryption_key=database_encryption_key,
+                files_directory=tdlib_directory,
+            )
         self.tg.login()
 
     def __del__(self):
@@ -49,7 +72,7 @@ class TelegramAPI:
         })
         return result
 
-    @timeout(Config.download_timeout)
+    @timeout(config.download_timeout)
     def speed_test(self, file_id):
         result = None
         start_time = time.time()

@@ -1,8 +1,25 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+
 class Config:
-    download_timeout = 30
-    download_chat_id = -1001419233283
-    download_message_id = 125829120
-    cron_expression_speed_test = "0 13,15,17,21 * * *"
-    cron_expression_ping = "0 13,15,17,21 * * *"
-    batch_size_ping = 256
-    batch_size_speed_test = 64
+    server_url = os.getenv("server_url")
+    agent_id = os.getenv("agent_id")
+    agent_secret = os.getenv("agent_secret")
+    telegram_app_id = os.getenv("telegram_app_id")
+    telegram_app_hash = os.getenv("telegram_app_hash")
+    telegram_phone = os.getenv("telegram_phone")
+    start_mtproto_address = os.getenv("start_mtproto_address")
+    start_mtproto_port = os.getenv("start_mtproto_port")
+    start_mtproto_secret = os.getenv("start_mtproto_secret")
+    database_encryption_key = os.getenv("database_encryption_key")
+    tdlib_directory = os.getenv("tdlib_directory")
+    download_timeout = os.getenv("download_timeout")
+    download_chat_id = os.getenv("download_chat_id")
+    download_message_id = os.getenv("download_message_id")
+    cron_expression_speed_test = os.getenv(
+        "cron_expression_speed_test")
+    cron_expression_ping = os.getenv("cron_expression_ping")
+    batch_size_ping = os.getenv("batch_size_ping")
+    batch_size_speed_test = os.getenv("batch_size_speed_test")
