@@ -1,8 +1,8 @@
-from dot_dict import DotDict
+from src.dot_dict import DotDict
 from timeout_decorator import timeout
 import time
 import telegram.client as client
-from config import Config
+from src.config import Config
 import os
 config = Config()
 

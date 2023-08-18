@@ -43,13 +43,13 @@ class Server:
 
     def get_ping_proxies(self):
         query = {}
-        return self._get("/api/proxy/ping", query)
+        return self._get(f"/api/{self.agent_id}/proxy/ping", query)
 
     def get_speed_test_proxies(self):
         query = {}
-        return self._get("/api/proxy/ping", query)  # todo
+        return self._get(f"/api/{self.agent_id}/proxy/speed_test", query)
 
     def send_report(self, proxies):
         query = {}
         body = proxies
-        return self._post("/api/report", query, body)
+        return self._post(f"/api/{self.agent_id}/report", query, body)
