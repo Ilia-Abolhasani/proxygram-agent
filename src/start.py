@@ -1,6 +1,6 @@
 from server import Server
 from Telegram import Telegram
-import test_proxies
+from src.cron.manager import start_jobs
 from config import Config
 
 if __name__ == '__main__':
@@ -17,4 +17,4 @@ if __name__ == '__main__':
     )
     result = telegram_api.remove_all_proxies()
     proxies = server.get_ping_proxies()
-    test_proxies.start(telegram_api, server, proxies, 4)
+    start_jobs(server, telegram_api)
