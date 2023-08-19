@@ -15,7 +15,7 @@ class Config:
     start_mtproto_secret = os.getenv("start_mtproto_secret")
     database_encryption_key = os.getenv("database_encryption_key")
     tdlib_directory = os.getenv("tdlib_directory")
-    download_timeout = os.getenv("download_timeout")
+    download_timeout = int(os.getenv("download_timeout"))
     download_chat_id = os.getenv("download_chat_id")
     download_message_id = os.getenv("download_message_id")
     cron_expression_speed_test = os.getenv(

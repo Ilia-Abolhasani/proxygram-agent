@@ -1,6 +1,6 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from src.cron.job_test_proxies import start_ping, start_speed_text
+from src.cron.job_test_proxies_ping import start_ping
 from src.config import Config
 
 

@@ -18,6 +18,5 @@ if __name__ == '__main__':
         Config.start_mtproto_secret
     )
     result = telegram_api.remove_all_proxies()
-    proxies = server.get_ping_proxies()
     manager.start_jobs(server, telegram_api)
     telegram_api.idle()
