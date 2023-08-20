@@ -40,6 +40,8 @@ def start_ping(server, telegram_api):
                 proxy.server,
                 proxy.port,
                 proxy.secret)
+            if (result.error):
+                print(result)
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
         # start paraller task
