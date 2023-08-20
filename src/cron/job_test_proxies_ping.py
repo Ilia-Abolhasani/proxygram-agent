@@ -27,7 +27,12 @@ def task_function(telegram_api, proxy):
 
 def start_ping(server, telegram_api):
     result = telegram_api.remove_all_proxies()
-    result = server.get_ping_proxies()
+    try:
+        result = server.get_ping_proxies()
+    except:
+        return
+    if not result:
+        return
     all_proxies = result['result']
     batch = Config.batch_size_ping
     pach_proxies = _create_packs(all_proxies, batch)

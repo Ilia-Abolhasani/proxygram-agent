@@ -6,7 +6,7 @@ from src.config import Config
 
 
 if __name__ == '__main__':
-    server = Server(Config.agent_id)
+    server = Server()
     telegram_api = Telegram(
         Config.telegram_app_id,
         Config.telegram_app_hash,
