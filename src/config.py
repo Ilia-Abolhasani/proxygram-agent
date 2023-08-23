@@ -21,5 +21,7 @@ class Config:
     cron_expression_speed_test = os.getenv(
         "cron_expression_speed_test")
     cron_expression_ping = os.getenv("cron_expression_ping")
+    cron_expression_ping_disconnect = os.getenv(
+        "cron_expression_ping_disconnect")
     batch_size_ping = int(os.getenv("batch_size_ping"))
     batch_size_speed_test = int(os.getenv("batch_size_speed_test"))

@@ -16,7 +16,7 @@ def download_spped(telegram_api):
 
 def _start(server, telegram_api, proxies, batch, speed_test):
     report_list = []
-    for proxy in tqdm.tqdm(proxies):
+    for proxy in proxies:
         proxy = DotDict(proxy)
         report = {"proxy_id": proxy.id}
         result = telegram_api.add_proxy(
@@ -94,7 +94,7 @@ def start_ping(server, telegram_api):
     counter = 0
     while (counter < len(proxies)):
         for proxy in range(0, ):
-        counter += batch
+            counter += batch
 
     for proxy in tqdm.tqdm(proxies):
         proxy = DotDict(proxy)
@@ -122,12 +122,13 @@ def start_ping(server, telegram_api):
         server.send_report({"reports": report_list})
 
 
-def start_speed_text(server, telegram_api):
+def start_speed_text(job_lock, server, telegram_api):
     result = telegram_api.remove_all_proxies()
     result = server.get_speed_test_proxies()
     proxies = result['result']
-    _start(server,
-           telegram_api,
-           proxies,
-           Config.batch_size_speed_test,
-           True)
+    with job_lock:
+        _start(server,
+               telegram_api,
+               proxies,
+               Config.batch_size_speed_test,
+               True)

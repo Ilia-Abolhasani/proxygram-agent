@@ -25,18 +25,11 @@ def task_function(telegram_api, proxy):
     return [result, proxy.id]
 
 
-def start_ping(server, telegram_api):
+def start_ping(server, telegram_api, all_proxies):
     result = telegram_api.remove_all_proxies()
-    try:
-        result = server.get_ping_proxies()
-    except:
-        return
-    if not result:
-        return
-    all_proxies = result['result']
     batch = Config.batch_size_ping
-    pach_proxies = _create_packs(all_proxies, batch)
-    for pack in tqdm.tqdm(pach_proxies):
+    pack_proxies = _create_packs(all_proxies, batch)
+    for pack in tqdm.tqdm(pack_proxies):
         result = telegram_api.remove_all_proxies()
         # first add proxy to proxy list
         for i in range(0, len(pack)):
@@ -73,3 +66,17 @@ def start_ping(server, telegram_api):
                 })
             server.send_report({"reports": reports})
     result = telegram_api.remove_all_proxies()
+
+
+def start_ping(job_lock, server, telegram_api, disconnect):
+    try:
+        result = server.get_ping_proxies(disconnect)
+    except:
+        return
+    if not result:
+        return
+    all_proxies = result['result']
+    if (len(all_proxies) == 0):
+        return
+    with job_lock:
+        start_ping(server, telegram_api, all_proxies)
