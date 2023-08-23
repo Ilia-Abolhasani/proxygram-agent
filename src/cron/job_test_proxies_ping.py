@@ -19,13 +19,13 @@ def _create_packs(_array, pack_size):
     return packs
 
 
-def task_function(telegram_api, proxy):
+def _task_function(telegram_api, proxy):
     print(f"started proxy: {proxy.id}")
     result = telegram_api.ping_proxy(proxy.td_proxy_id)
     return [result, proxy.id]
 
 
-def start_ping(server, telegram_api, all_proxies):
+def _start(server, telegram_api, all_proxies):
     result = telegram_api.remove_all_proxies()
     batch = Config.batch_size_ping
     pack_proxies = _create_packs(all_proxies, batch)
@@ -48,7 +48,7 @@ def start_ping(server, telegram_api, all_proxies):
             for proxy in pack:
                 futures.append(
                     executor.submit(
-                        task_function,
+                        _task_function,
                         telegram_api,
                         proxy)
                 )
@@ -79,4 +79,4 @@ def start_ping(job_lock, server, telegram_api, disconnect):
     if (len(all_proxies) == 0):
         return
     with job_lock:
-        start_ping(server, telegram_api, all_proxies)
+        _start(server, telegram_api, all_proxies)

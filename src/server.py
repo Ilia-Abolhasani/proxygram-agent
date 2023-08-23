@@ -65,7 +65,7 @@ class Server:
             print(f"Request failed with status code: {response.status_code}")
 
     def get_ping_proxies(self, disconnect):
-        query = {disconnect: disconnect}
+        query = {"disconnect": disconnect}
         return self._get(f"/api/{self.agent_id}/proxy/ping", query)
 
     def get_speed_test_proxies(self):
@@ -75,4 +75,4 @@ class Server:
     def send_report(self, proxies):
         query = {}
         body = proxies
-        return self._post(f"/api/{self.agent_id}/report", query, body)
+        return self._post(f"/api/{self.agent_id}/report/recive", query, body)
