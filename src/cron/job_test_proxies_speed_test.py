@@ -109,8 +109,7 @@ def start_ping(server, telegram_api):
         seconds = -1
         if (not result.error):
             seconds = result.update['seconds'] * 1000
-            if (speed_test):
-                report['download_speed'] = download_spped(telegram_api)
+            report['download_speed'] = download_spped(telegram_api)
         result = telegram_api.remove_proxy(proxy_id)
         report['ping'] = seconds
         report_list.append(report)
