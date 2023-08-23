@@ -88,7 +88,6 @@ class Telegram:
         size = result.update['size']
         if os.path.exists(file_path):
             os.remove(file_path)
-        print(elapsed_time)
         return round(size / elapsed_time / 1000, 2)
 
     def add_proxy(self, server, port, secret):

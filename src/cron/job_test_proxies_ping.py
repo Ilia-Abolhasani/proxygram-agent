@@ -1,22 +1,9 @@
 import concurrent.futures
 from src.dot_dict import DotDict
 from src.config import Config
+from src.util import create_packs
+
 import tqdm
-
-
-def _create_packs(_array, pack_size):
-    num_packs = len(_array) // pack_size
-    if len(_array) % pack_size != 0:
-        num_packs += 1
-
-    packs = []
-    for i in range(num_packs):
-        start_idx = i * pack_size
-        end_idx = start_idx + pack_size
-        pack = _array[start_idx:end_idx]
-        packs.append(pack)
-
-    return packs
 
 
 def _task_function(telegram_api, proxy):
@@ -25,10 +12,10 @@ def _task_function(telegram_api, proxy):
     return [result, proxy.id]
 
 
-def _start(server, telegram_api, all_proxies):
+def _start(server, telegram_api, proxies):
     result = telegram_api.remove_all_proxies()
     batch = Config.batch_size_ping
-    pack_proxies = _create_packs(all_proxies, batch)
+    pack_proxies = create_packs(proxies, batch)
     for pack in tqdm.tqdm(pack_proxies):
         result = telegram_api.remove_all_proxies()
         # first add proxy to proxy list

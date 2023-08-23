@@ -9,9 +9,10 @@ job_lock = threading.Lock()
 
 
 def start_jobs(server, telegram_api):
-    start_ping(job_lock, server, telegram_api, False)
     scheduler = BackgroundScheduler(
-        {'apscheduler.job_defaults.max_instances': 3})
+        {'apscheduler.job_defaults.max_instances': 3}
+    )
+    start_speed_text(job_lock, server, telegram_api)
     # ping
     scheduler.add_job(
         lambda: start_ping(job_lock, server, telegram_api, False),
