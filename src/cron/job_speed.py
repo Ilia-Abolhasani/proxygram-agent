@@ -34,13 +34,34 @@ def _start(server, telegram_api, proxies):
             result = telegram_api.enable_proxy(td_proxy_id)
             result = telegram_api.ping_proxy(td_proxy_id)
             seconds = -1
+            speed = 0
             if (not result.error):
                 seconds = result.update['seconds'] * 1000
-                report['download_speed'] = download_spped(telegram_api)
+                speed = download_spped(telegram_api)
             result = telegram_api.remove_proxy(td_proxy_id)
+            report['speed'] = speed
             report['ping'] = seconds
             report_list.append(report)
-        server.send_report({"reports": report_list})
+        server.send_speed_report({"reports": report_list})
+
+
+def _start_speed(server, telegram_api):
+    result = telegram_api.remove_all_proxies()
+    try:
+        result = server.get_speed_test_proxies()
+    except:
+        return
+    if not result:
+        return
+    proxies = result['result']
+    if (len(proxies) == 0):
+        queue.speed_test = False
+        return
+
+    _start(server,
+           telegram_api,
+           proxies
+           )
 
 
 def start_safe(server, telegram_api):
@@ -48,12 +69,5 @@ def start_safe(server, telegram_api):
     if (queue.speed_test):
         return
     queue.speed_test = True
-    result = telegram_api.remove_all_proxies()
-    result = server.get_speed_test_proxies()
-    proxies = result['result']
-
-    _start(server,
-           telegram_api,
-           proxies
-           )
+    _start_speed(server, telegram_api)
     queue.speed_test = False

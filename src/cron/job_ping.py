@@ -50,7 +50,7 @@ def _start(server, telegram_api, proxies):
                     "proxy_id": proxy_id,
                     "ping": seconds
                 })
-            server.send_report({"reports": reports})
+            server.send_ping_report({"reports": reports})
     result = telegram_api.remove_all_proxies()
 
 
@@ -61,10 +61,10 @@ def _start_ping(server, telegram_api, disconnect):
         return
     if not result:
         return
-    all_proxies = result['result']
-    if (len(all_proxies) == 0):
+    proxies = result['result']
+    if (len(proxies) == 0):
         return
-    _start(server, telegram_api, all_proxies)
+    _start(server, telegram_api, proxies)
 
 
 def start_safe(server, telegram_api, disconnect):

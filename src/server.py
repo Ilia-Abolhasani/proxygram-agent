@@ -70,9 +70,14 @@ class Server:
 
     def get_speed_test_proxies(self):
         query = {}
-        return self._get(f"/api/{self.agent_id}/proxy/speed_test", query)
+        return self._get(f"/api/{self.agent_id}/proxy/speed", query)
 
-    def send_report(self, proxies):
+    def send_speed_report(self, proxies):
         query = {}
         body = proxies
-        return self._post(f"/api/{self.agent_id}/report/recive", query, body)
+        return self._post(f"/api/{self.agent_id}/report/speed", query, body)
+
+    def send_ping_report(self, proxies):
+        query = {}
+        body = proxies
+        return self._post(f"/api/{self.agent_id}/report/ping", query, body)
