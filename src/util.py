@@ -11,3 +11,9 @@ def create_packs(_array, pack_size):
         packs.append(pack)
 
     return packs
+
+
+class DotDict(dict):
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__

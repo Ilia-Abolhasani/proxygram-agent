@@ -1,4 +1,4 @@
-from src.dot_dict import DotDict
+from src.util import DotDict
 from timeout_decorator import timeout
 import time
 import telegram.client as client

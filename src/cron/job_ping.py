@@ -1,8 +1,7 @@
 import concurrent.futures
-from src.dot_dict import DotDict
+from src.util import DotDict, create_packs
 from src.config import Config
-from src.util import create_packs
-
+from src.cron import job_lock, queue
 import tqdm
 
 
@@ -55,7 +54,7 @@ def _start(server, telegram_api, proxies):
     result = telegram_api.remove_all_proxies()
 
 
-def start_ping(job_lock, server, telegram_api, disconnect):
+def _start_ping(server, telegram_api, disconnect):
     try:
         result = server.get_ping_proxies(disconnect)
     except:
@@ -65,5 +64,24 @@ def start_ping(job_lock, server, telegram_api, disconnect):
     all_proxies = result['result']
     if (len(all_proxies) == 0):
         return
-    with job_lock:
-        _start(server, telegram_api, all_proxies)
+    _start(server, telegram_api, all_proxies)
+
+
+def start_safe(server, telegram_api, disconnect):
+    global job_lock, queue
+    if (disconnect):
+        if (queue.ping_disconnect):
+            return
+        queue.ping_disconnect = True
+        with job_lock:
+            _start_ping(server, telegram_api, disconnect)
+        queue.ping_disconnect = False
+        return
+    else:
+        if (queue.ping_connect):
+            return
+        queue.ping_connect = True
+        with job_lock:
+            _start_ping(server, telegram_api, disconnect)
+        queue.ping_connect = False
+        return

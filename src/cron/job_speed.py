@@ -1,6 +1,7 @@
-from src.dot_dict import DotDict
+from src.util import DotDict
 from src.config import Config
 from src.util import create_packs
+from src.cron import job_lock, queue
 
 import tqdm
 
@@ -42,12 +43,17 @@ def _start(server, telegram_api, proxies):
         server.send_report({"reports": report_list})
 
 
-def start_speed_text(job_lock, server, telegram_api):
+def start_safe(server, telegram_api):
+    global queue
+    if (queue.speed_test):
+        return
+    queue.speed_test = True
     result = telegram_api.remove_all_proxies()
     result = server.get_speed_test_proxies()
     proxies = result['result']
-    with job_lock:
-        _start(server,
-               telegram_api,
-               proxies
-               )
+
+    _start(server,
+           telegram_api,
+           proxies
+           )
+    queue.speed_test = False
