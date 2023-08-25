@@ -1,0 +1,5 @@
+python-dotenv
+python-telegram 
+timeout-decorator
+schedule
+apscheduler
