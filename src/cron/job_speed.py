@@ -49,7 +49,8 @@ def _start_speed(server, telegram_api):
     result = telegram_api.remove_all_proxies()
     try:
         result = server.get_speed_test_proxies()
-    except:
+    except Exception as error:
+        print(error)
         return
     if not result:
         return
