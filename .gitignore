@@ -11,3 +11,4 @@ MANIFEST
 .DS_Store
 .vscode
 .env
+/tdlibs/td*
