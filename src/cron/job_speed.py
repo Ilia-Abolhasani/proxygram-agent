@@ -2,8 +2,7 @@ from src.util import DotDict
 from src.config import Config
 from src.util import create_packs
 from src.cron import job_lock, queue
-
-import tqdm
+from tqdm import tqdm
 
 
 def download_spped(telegram_api):
@@ -21,9 +20,9 @@ def _start(server, telegram_api, proxies):
     result = telegram_api.remove_all_proxies()
     batch = Config.batch_size_speed_test
     pack_proxies = create_packs(proxies, batch)
-    for pack in tqdm.tqdm(pack_proxies):
+    for pack in tqdm(pack_proxies, desc="Packs"):
         report_list = []
-        for proxy in pack:
+        for proxy in tqdm(pack, desc="Proxies", leave=False):
             proxy = DotDict(proxy)
             report = {"proxy_id": proxy.id}
             result = telegram_api.add_proxy(
