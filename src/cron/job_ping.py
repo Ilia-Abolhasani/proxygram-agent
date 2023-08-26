@@ -34,6 +34,7 @@ def _start(server, telegram_api, proxies):
                 print("td_proxy_id is empty", proxy.server,
                       proxy.port, proxy.secret)
                 print(result)
+                asda
 
             pack[i] = proxy
         # start paraller task
