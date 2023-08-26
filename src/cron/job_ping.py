@@ -28,7 +28,13 @@ def _start(server, telegram_api, proxies):
                 print("add proxy error", proxy.server,
                       proxy.port, proxy.secret)
                 print(result)
-            proxy.td_proxy_id = result.update['id']
+            try:
+                proxy.td_proxy_id = result.update['id']
+            except:
+                print("td_proxy_id is empty", proxy.server,
+                      proxy.port, proxy.secret)
+                print(result)
+
             pack[i] = proxy
         # start paraller task
         with concurrent.futures.ThreadPoolExecutor() as executor:
