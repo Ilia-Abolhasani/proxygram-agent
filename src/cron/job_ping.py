@@ -27,6 +27,7 @@ def _start(server, telegram_api, proxies):
                 proxy.secret)
             if (result.error):
                 proxy.error = True
+                pack[i] = proxy
                 continue
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
