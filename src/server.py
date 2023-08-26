@@ -1,6 +1,6 @@
 import os
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 from src.config import Config
 
@@ -12,7 +12,7 @@ class Server:
         self.agent_secret = Config.agent_secret
 
     def _create_headers(self):
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
         message = f'{timestamp}{self.agent_secret}'
         hashed_timestamp = hashlib.sha256(message.encode()).hexdigest()
 
