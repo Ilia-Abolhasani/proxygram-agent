@@ -30,6 +30,8 @@ def _start(server, telegram_api, proxies):
                 proxy.server,
                 proxy.port,
                 proxy.secret)
+            if (result.error):
+                continue
             td_proxy_id = result.update['id']
             result = telegram_api.enable_proxy(td_proxy_id)
             result = telegram_api.ping_proxy(td_proxy_id)
