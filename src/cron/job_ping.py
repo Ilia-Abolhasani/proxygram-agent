@@ -20,11 +20,13 @@ def _start(server, telegram_api, proxies):
         # first add proxy to proxy list
         for i in range(0, len(pack)):
             proxy = DotDict(pack[i])
+            proxy.error = False
             result = telegram_api.add_proxy(
                 proxy.server,
                 proxy.port,
                 proxy.secret)
             if (result.error):
+                proxy.error = True
                 continue
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
@@ -32,6 +34,8 @@ def _start(server, telegram_api, proxies):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for proxy in pack:
+                if (proxy.error):
+                    continue
                 futures.append(
                     executor.submit(
                         _task_function,
