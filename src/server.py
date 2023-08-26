@@ -31,7 +31,7 @@ class Server:
             return data
         else:
             print(f"Request failed with status code: {response.status_code}")
-            print(response)
+            print(response.text)
         return None
 
     def _post(self, url, query, body):
