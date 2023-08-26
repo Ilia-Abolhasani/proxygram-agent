@@ -57,9 +57,11 @@ def _start(server, telegram_api, proxies):
 def _start_ping(server, telegram_api, disconnect):
     try:
         result = server.get_ping_proxies(disconnect)
-    except:
+    except Exception as error:
+        print(error)
         return
     if not result:
+        print("no result fetched.")
         return
     proxies = result['result']
     if (len(proxies) == 0):
