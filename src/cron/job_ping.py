@@ -25,6 +25,8 @@ def _start(server, telegram_api, proxies):
                 proxy.port,
                 proxy.secret)
             if (result.error):
+                print("add proxy error", proxy.server,
+                      proxy.port, proxy.secret)
                 print(result)
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
