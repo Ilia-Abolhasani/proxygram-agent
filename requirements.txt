@@ -3,3 +3,4 @@ python-telegram
 timeout-decorator
 schedule
 apscheduler
+requests
