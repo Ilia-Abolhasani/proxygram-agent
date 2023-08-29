@@ -10,7 +10,7 @@ def download_spped(telegram_api):
         Config.download_chat_id,
         Config.download_message_id)
     if (result.error):
-        print(result)
+        print(str(result))
     content = result.update["content"]
     document = content['document']
     document = document['document']
