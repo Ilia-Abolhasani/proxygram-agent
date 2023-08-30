@@ -11,10 +11,14 @@ def download_spped(telegram_api):
         Config.download_message_id)
     if (result.error):
         print(result.error_info['message'])
-    content = result.update["content"]
-    document = content['document']
-    document = document['document']
-    file_id = document['id']
+    try:
+        content = result.update["content"]
+        document = content['document']
+        document = document['document']
+        file_id = document['id']
+    except Exception as error:
+        print(result.update)
+        raise error
     return telegram_api.speed_test(file_id)
 
 
