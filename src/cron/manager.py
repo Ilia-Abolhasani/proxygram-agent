@@ -9,7 +9,7 @@ def start_jobs(server, telegram_api_ping, telegram_api_speed):
     scheduler = BackgroundScheduler(
         {'apscheduler.job_defaults.max_instances': 3}
     )
-    job_speed.start_safe(server, telegram_api_speed)
+    # job_speed.start_safe(server, telegram_api_speed)
     # ping
     scheduler.add_job(
         lambda: job_ping.start_safe(server, telegram_api_ping, False),
