@@ -3,6 +3,7 @@ from src.config import Config
 from src.util import create_packs
 from src.cron import job_lock, queue
 from tqdm import tqdm
+import time
 
 
 def download_spped(telegram_api):
@@ -27,6 +28,9 @@ def _start(server, telegram_api, proxies):
     batch = Config.batch_size_speed_test
     pack_proxies = create_packs(proxies, batch)
     for pack in tqdm(pack_proxies, desc="Packs"):
+        print("job-speed start packet")
+        start_time = time.time()
+
         report_list = []
         for proxy in tqdm(pack, desc="Proxies", leave=False):
             proxy = DotDict(proxy)
@@ -50,6 +54,9 @@ def _start(server, telegram_api, proxies):
             report['ping'] = seconds
             report_list.append(report)
         server.send_speed_report({"reports": report_list})
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print(f"job-speed packet sent elapsed_time: {elapsed_time}")
 
 
 def _start_speed(server, telegram_api):

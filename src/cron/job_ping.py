@@ -3,6 +3,7 @@ from src.util import DotDict, create_packs
 from src.config import Config
 from src.cron import job_lock, queue
 import tqdm
+import time
 
 
 def _task_function(telegram_api, proxy):
@@ -16,6 +17,8 @@ def _start(server, telegram_api, proxies):
     batch = Config.batch_size_ping
     pack_proxies = create_packs(proxies, batch)
     for pack in tqdm.tqdm(pack_proxies):
+        print("job-ping start packet")
+        start_time = time.time()
         result = telegram_api.remove_all_proxies()
         # first add proxy to proxy list
         for i in range(0, len(pack)):
@@ -56,6 +59,9 @@ def _start(server, telegram_api, proxies):
                     "ping": seconds
                 })
             server.send_ping_report({"reports": reports})
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            print(f"job-ping packet sent elapsed_time: {elapsed_time}")
     result = telegram_api.remove_all_proxies()
 
 
