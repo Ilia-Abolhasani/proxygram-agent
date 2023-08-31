@@ -7,7 +7,7 @@ import time
 
 
 def _task_function(telegram_api, proxy):
-    print(f"started proxy: {proxy.id}")
+    # print(f"started proxy: {proxy.id}")
     result = telegram_api.ping_proxy(proxy.td_proxy_id)
     return [result, proxy.id]
 
