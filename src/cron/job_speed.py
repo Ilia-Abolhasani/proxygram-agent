@@ -18,7 +18,7 @@ def download_spped(telegram_api):
         document = document['document']
         file_id = document['id']
     except Exception as error:
-        print(result.update)
+        print(result)
         raise error
     return telegram_api.speed_test(file_id)
 
