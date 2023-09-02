@@ -4,7 +4,6 @@ import time
 import telegram.client as client
 from src.config import Config
 import os
-config = Config()
 
 
 class Telegram:
@@ -57,6 +56,18 @@ class Telegram:
     def _dot(self, dict):
         return DotDict(dict)
 
+    def set_log_verbose_level(self, new_verbosity_level):
+        # level 0: fatal errors
+        # level 1: erroes
+        # level 2: warning & debug 
+        # level 3: info
+        # level 4: debug
+        # level 5: verbose debu
+        result = self._call("setLogVerbosityLevel", {
+            'new_verbosity_level': new_verbosity_level
+        })
+        return result
+
     def download_file(self, file_id, priority):
         result = self._call("downloadFile", {
             'file_id': file_id,
@@ -72,7 +83,7 @@ class Telegram:
         })
         return result
 
-    @timeout(config.download_timeout)
+    @timeout(Config.download_timeout)
     def speed_test(self, file_id):
         result = None
         start_time = time.time()

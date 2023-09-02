@@ -7,19 +7,7 @@ import sys
 import logging
 
 
-def setup_logging(level=logging.INFO):
-    root = logging.getLogger()
-    root.setLevel(level)
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)s] %(name)s: %(message)s')
-    ch.setFormatter(formatter)
-    root.addHandler(ch)
-
-
 if __name__ == '__main__':
-    setup_logging(level=logging.ERROR)
     server = Server()
     # telegram api for ping
     telegram_api_ping = Telegram(
@@ -32,6 +20,7 @@ if __name__ == '__main__':
         Config.start_mtproto_port,
         Config.start_mtproto_secret
     )
+    telegram_api_ping.set_log_verbose_level(1)
     result = telegram_api_ping.remove_all_proxies()
     # telegram api for speed
     telegram_api_speed = Telegram(
@@ -44,6 +33,7 @@ if __name__ == '__main__':
         Config.start_mtproto_port,
         Config.start_mtproto_secret
     )
+    telegram_api_speed.set_log_verbose_level(1)
     result = telegram_api_speed.remove_all_proxies()
     manager.start_jobs(server, telegram_api_ping, telegram_api_speed)
     telegram_api_ping.idle()
