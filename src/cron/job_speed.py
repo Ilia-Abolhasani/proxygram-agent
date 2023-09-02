@@ -7,9 +7,13 @@ import time
 
 
 def download_spped(telegram_api):
+    # todo should remove in feature
+    mess, last_id = telegram_api.channel_hsitory(
+        "speed_test_channel", 5, None)
+    #
     result = telegram_api.get_message(
-        Config.download_chat_id,
-        Config.download_message_id)
+        int(Config.download_chat_id),
+        int(Config.download_message_id))
     if (result.error):
         print(result.error_info['message'])
     try:
@@ -18,8 +22,9 @@ def download_spped(telegram_api):
         document = document['document']
         file_id = document['id']
     except Exception as error:
-        print(result)
-        raise error
+        print("happend", result)
+        return 0
+        # raise error
     return telegram_api.speed_test(file_id)
 
 
