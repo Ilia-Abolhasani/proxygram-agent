@@ -3,9 +3,23 @@ from src.server import Server
 from src.Telegram import Telegram
 from src.cron import manager
 from src.config import Config
+import sys
+import logging
+
+
+def setup_logging(level=logging.INFO):
+    root = logging.getLogger()
+    root.setLevel(level)
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        '%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+    ch.setFormatter(formatter)
+    root.addHandler(ch)
 
 
 if __name__ == '__main__':
+    setup_logging(level=logging.ERROR)
     server = Server()
     # telegram api for ping
     telegram_api_ping = Telegram(
