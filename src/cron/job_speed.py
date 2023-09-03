@@ -88,5 +88,9 @@ def start_safe(server, telegram_api):
     if (queue.speed_test):
         return
     queue.speed_test = True
-    _start_speed(server, telegram_api)
+    try:
+        _start_speed(server, telegram_api)
+    except Exception as error:
+        queue.speed_test = False
+        raise error
     queue.speed_test = False
