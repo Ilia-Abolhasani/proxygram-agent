@@ -59,7 +59,7 @@ class Telegram:
     def set_log_verbose_level(self, new_verbosity_level):
         # level 0: fatal errors
         # level 1: erroes
-        # level 2: warning & debug 
+        # level 2: warning & debug
         # level 3: info
         # level 4: debug
         # level 5: verbose debu
@@ -83,7 +83,7 @@ class Telegram:
         })
         return result
 
-    @timeout(Config.download_timeout)
+    @timeout(Config.download_timeout, use_signals=False)
     def speed_test(self, file_id):
         result = None
         start_time = time.time()
