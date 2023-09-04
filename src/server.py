@@ -82,3 +82,10 @@ class Server:
         query = {}
         body = proxies
         return self._post(f"/api/{self.agent_id}/report/ping", query, body)
+
+    def send_log(self, message):
+        query = {}
+        body = {
+            "message": message
+        }
+        return self._post(f"/api/{self.agent_id}/log/recive", query, body)
