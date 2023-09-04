@@ -1,9 +1,10 @@
 from src.util import DotDict
-from timeout_decorator import timeout
 import time
 import telegram.client as client
 from src.config import Config
 import os
+import concurrent.futures
+import threading
 
 
 class Telegram:
@@ -83,16 +84,18 @@ class Telegram:
         })
         return result
 
-    @timeout(Config.download_timeout, use_signals=False)
     def speed_test(self, file_id):
         result = None
         start_time = time.time()
-        try:
-            result = self.download_file(file_id, 32)
-        except Exception as e:
-            self.cancel_download_file(file_id, False)
-            # todo we need to remove download
-            return None
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(lambda: self.download_file(file_id, 32))
+            try:
+                result = future.result(timeout=Config.download_timeout)
+            except concurrent.futures.TimeoutError:
+                self.cancel_download_file(file_id, False)
+                # todo we need to remove download
+                return 0
         end_time = time.time()
         elapsed_time = end_time - start_time
         file_path = result.update['local']['path']
