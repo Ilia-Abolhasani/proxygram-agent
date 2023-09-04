@@ -41,8 +41,7 @@ def start_jobs(server, telegram_api_ping, telegram_api_speed):
     # speed test
     scheduler.add_job(
         lambda: job_speed.start_safe(server, telegram_api_speed),
-        # trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test)
-        trigger=CronTrigger.from_crontab("* * * * *")
+        trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test)
     )
 
     scheduler.start()
