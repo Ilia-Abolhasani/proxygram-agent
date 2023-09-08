@@ -165,8 +165,7 @@ class Telegram:
         })
         return result
 
-    def channel_hsitory(self, username, limit, min_message_id):
-        chat_id = self.search_public_chat(username)
+    def channel_history(self, chat_id, limit, min_message_id):
         last_message_id = None
         from_message_id = 0
         counter = 0
