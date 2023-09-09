@@ -8,8 +8,8 @@ import time
 
 def download_spped(telegram_api):
     # todo should remove in feature
-    mess, last_id = telegram_api.channel_hsitory(
-        "speed_test_channel", 5, None)
+    mess, last_id = telegram_api.channel_history(
+        int(Config.download_chat_id), 5, None)
     #
     result = telegram_api.get_message(
         int(Config.download_chat_id),
