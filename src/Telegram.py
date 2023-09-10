@@ -175,7 +175,8 @@ class Telegram:
             result = self.get_chat_history(
                 chat_id, 50, from_message_id, 0, False)
             if (result.error):
-                break
+                raise Exception(
+                    f"Error happend in fetch channel_history, chat_id {chat_id} " + str(result.error_info['message']))
             if (result.update['total_count'] == 0):
                 break
             for message in result.update['messages']:
