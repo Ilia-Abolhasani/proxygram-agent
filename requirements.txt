@@ -3,5 +3,4 @@ requests
 schedule
 apscheduler
 python-dotenv
-python-telegram 
 git+https://github.com/Ilia-Abolhasani/python-telegram
