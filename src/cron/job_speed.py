@@ -2,8 +2,11 @@ from src.util import DotDict
 from src.config import Config
 from src.util import create_packs
 from src.cron import job_lock, queue
+from src.config import Config
 from tqdm import tqdm
 import time
+import os
+import concurrent.futures
 
 
 def download_spped(telegram_api):
@@ -23,7 +26,25 @@ def download_spped(telegram_api):
         file_id = document['id']
     except Exception as error:
         raise error
-    return telegram_api.speed_test(file_id)
+    # speed test
+    result = None
+    start_time = time.time()
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        future = executor.submit(
+            lambda: telegram_api.download_file(file_id, 32))
+        try:
+            result = future.result(timeout=Config.download_timeout)
+        except concurrent.futures.TimeoutError:
+            telegram_api.cancel_download_file(file_id, False)
+            # todo we need to remove download
+            return 0
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    file_path = result.update['local']['path']
+    size = result.update['size']
+    if os.path.exists(file_path):
+        os.remove(file_path)
+    return round(size / elapsed_time / 1000, 2)
 
 
 def _start(server, telegram_api, proxies):

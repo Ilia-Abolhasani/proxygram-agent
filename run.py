@@ -1,16 +1,14 @@
 import src
 from src.server import Server
-from src.Telegram import Telegram
+from telegram.telegram_api import Telegram_API
 from src.cron import manager
 from src.config import Config
-import sys
-import logging
 
 
 if __name__ == '__main__':
     server = Server()
     # telegram api for ping
-    telegram_api_ping = Telegram(
+    telegram_api_ping = Telegram_API(
         Config.telegram_app_id,
         Config.telegram_app_hash,
         Config.telegram_phone,
@@ -23,7 +21,7 @@ if __name__ == '__main__':
     telegram_api_ping.set_log_verbose_level(1)
     result = telegram_api_ping.remove_all_proxies()
     # telegram api for speed
-    telegram_api_speed = Telegram(
+    telegram_api_speed = Telegram_API(
         Config.telegram_app_id,
         Config.telegram_app_hash,
         Config.telegram_phone,
