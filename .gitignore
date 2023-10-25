@@ -1,4 +1,5 @@
 __pycache__
+venv/
 dist
 build
 python_telegram.egg-info
