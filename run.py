@@ -33,6 +33,7 @@ if __name__ == '__main__':
     )
     telegram_api_speed.set_log_verbose_level(1)
     result = telegram_api_speed.remove_all_proxies()
+    print("strat manager.")
     manager.start_jobs(server, telegram_api_ping, telegram_api_speed)
     telegram_api_ping.idle()
     telegram_api_speed.stop()
