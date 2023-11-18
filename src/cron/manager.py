@@ -22,7 +22,7 @@ def start_jobs(server, telegram_api_ping, telegram_api_speed):
     scheduler.add_listener(lambda event: error_handler(server,  event),
                            EVENT_JOB_ERROR)
 
-    job_ping.start_safe(server, telegram_api_ping, False)
+    #job_ping.start_safe(server, telegram_api_ping, False)
     job_speed.start_safe(server, telegram_api_speed)
 
     # ping

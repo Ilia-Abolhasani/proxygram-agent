@@ -11,8 +11,8 @@ import concurrent.futures
 
 def download_spped(telegram_api):
     # todo should remove in feature
-    mess, last_id = telegram_api.channel_history(
-        int(Config.download_chat_id), 5, None)
+    chat_id = telegram_api.search_public_chat(Config.download_username)
+    mess, last_id = telegram_api.channel_history(chat_id, 5, None)
     #
     result = telegram_api.get_message(
         int(Config.download_chat_id),

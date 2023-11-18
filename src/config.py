@@ -18,6 +18,7 @@ class Config:
     tdlib_directory_speed = os.getenv("tdlib_directory_speed")
     download_timeout = int(os.getenv("download_timeout"))
     download_chat_id = os.getenv("download_chat_id")
+    download_username = os.getenv("download_username")
     download_message_id = os.getenv("download_message_id")
     cron_expression_speed_test = os.getenv(
         "cron_expression_speed_test")
