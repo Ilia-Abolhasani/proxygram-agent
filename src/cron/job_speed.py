@@ -96,7 +96,7 @@ def _start_speed(server, telegram_api):
     if (len(proxies) == 0):
         queue.speed_test = False
         return
-
+    proxies = proxies[:16] # todo remore it 
     _start(server,
            telegram_api,
            proxies
