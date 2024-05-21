@@ -1,9 +1,10 @@
+import time
+import tqdm
 import concurrent.futures
+
 from src.util import DotDict, create_packs
 from src.config import Config
 from src.cron import job_lock, queue
-import tqdm
-import time
 
 
 def _task_function(telegram_api, proxy):
@@ -31,6 +32,9 @@ def _start(server, telegram_api, proxies):
             if (result.error):
                 proxy.error = True
                 pack[i] = proxy
+                err = result.error_info['message']
+                if err == 'Wrong proxy secret' or err == 'Unsupported proxy secret':
+                    server.delete_proxy(proxy.id)                    
                 continue
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
@@ -48,7 +52,6 @@ def _start(server, telegram_api, proxies):
                 )
             # Wait for all tasks to complete
             concurrent.futures.wait(futures)
-            reports = []
             for future in futures:
                 [result, proxy_id] = future.result()
                 seconds = -1

@@ -83,6 +83,10 @@ class Server:
         body = proxies
         return self._post(f"/api/{self.agent_id}/report/ping", query, body)
 
+    def delete_proxy(self, proxy_id):
+        query = {}
+        return self._delete(f"/api/{self.agent_id}/proxy/delete/{proxy_id}", query)
+
     def send_log(self, message):
         query = {}
         body = {
