@@ -39,6 +39,7 @@ def _start(server, telegram_api, proxies):
             proxy.td_proxy_id = result.update['id']
             pack[i] = proxy
         # start paraller task
+        reports = []
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = []
             for proxy in pack:
