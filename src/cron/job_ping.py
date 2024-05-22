@@ -34,6 +34,7 @@ def _start(server, telegram_api, proxies):
                 pack[i] = proxy
                 err = result.error_info['message']
                 if err == 'Wrong proxy secret' or err == 'Unsupported proxy secret':
+                    print("send delete proxy request.")
                     server.delete_proxy(proxy.id)                    
                 continue
             proxy.td_proxy_id = result.update['id']
