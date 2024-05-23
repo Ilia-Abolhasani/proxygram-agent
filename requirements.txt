@@ -3,4 +3,4 @@ requests
 schedule
 apscheduler
 python-dotenv
-git+https://github.com/Ilia-Abolhasani/python-telegram
+proxies-tg-wrapper==1.0.1
