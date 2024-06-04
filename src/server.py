@@ -22,48 +22,93 @@ class Server:
         }
         return headers
 
-    def _get(self, url, query):
+    def _get(self, url, query, sendLog=True):
         headers = self._create_headers()
-        response = requests.get(self.base_url + url,
-                                params=query, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            return data
-        else:
-            print(f"Request failed with status code: {response.status_code}")
-            print(response.text)
+        response = None
+        try:
+            response = requests.get(self.base_url + url,
+                                    params=query, headers=headers, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                return data
+            raise Exception("Status_code is not 200.")
+        except Exception as err:       
+            msg = f'''Request failed with status code: {response.status_code if response else ""}
+                Method: GET
+                Response: {response.text if response else ""}
+                Url: {url}
+                Query: {query}
+                Exception: {err}'''
+            print(msg)
+            if sendLog: self.send_log(msg)
         return None
 
-    def _post(self, url, query, body):
+    def _post(self, url, query, body, sendLog=True):
         headers = self._create_headers()
-        response = requests.post(
-            self.base_url + url, params=query, json=body, headers=headers)
-        if response.status_code == 201 or response.status_code == 200:
-            data = response.json()
-            return data
-        else:
-            print(f"Request failed with status code: {response.status_code}")
+        response = None
+        try:
+            response = requests.post(
+                self.base_url + url, params=query, json=body, headers=headers, timeout=5)
+            if response.status_code == 201 or response.status_code == 200:
+                data = response.json()
+                return data
+            raise Exception("Status_code is not 200.")
+        except Exception as err:
+            msg = f'''
+                Request failed with status code: {response.status_code if response else ""}
+                Method: POST
+                Response: {response.text if response else ""}
+                Url: {url}
+                Query: {query}
+                Body: {body}
+            '''
+            print(msg)
+            if sendLog: self.send_log(msg)
         return None
 
-    def _update(self, url, query, body):
+    def _update(self, url, query, body, sendLog=True):
         headers = self._create_headers()
-        response = requests.put(self.base_url + url,
-                                params=query, json=body, headers=headers)
-        if response.status_code == 200:
-            data = response.json()
-            return data
-        else:
-            print(f"Request failed with status code: {response.status_code}")
+        response = None
+        try:
+            response = requests.put(self.base_url + url,
+                                    params=query, json=body, headers=headers, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                return data
+            raise Exception("Status_code is not 200.")
+        except Exception as err:
+            msg = f'''
+                Request failed with status code: {response.status_code if response else ""}
+                Method: PUT
+                Response: {response.text if response else ""}
+                Url: {url}
+                Query: {query}
+                Body: {body}
+            '''
+            print(msg)
+            if sendLog: self.send_log(msg)
         return None
 
-    def _delete(self, url, query):
+    def _delete(self, url, query, sendLog=True):
         headers = self._create_headers()
-        response = requests.delete(
-            self.base_url + url, params=query, headers=headers)
-        if response.status_code == 204:  # Assuming 204 is the successful status code for a successful deletion
-            print("Resource deleted successfully.")
-        else:
-            print(f"Request failed with status code: {response.status_code}")
+        response = None
+        try:
+            response = requests.delete(
+                self.base_url + url, params=query, headers=headers, timeout=5)
+            if response.status_code == 204:  # Assuming 204 is the successful status code for a successful deletion
+                print("Resource deleted successfully.")
+                return
+            raise Exception("Status_code is not 204.")
+        except Exception as err:
+            msg = f'''
+                Request failed with status code: {response.status_code if response else ""}
+                Method: DELETE
+                Response: {response.text if response else ""}
+                Url: {url}
+                Query: {query}                
+            '''
+            print(msg)
+            if sendLog: self.send_log(msg)        
 
     def get_ping_proxies(self, disconnect):
         query = {"disconnect": disconnect}
@@ -91,5 +136,5 @@ class Server:
         query = {}
         body = {
             "message": message
-        }
-        return self._post(f"/api/{self.agent_id}/log/recive", query, body)
+        }        
+        return self._post(f"/api/{self.agent_id}/log/recive", query, body, False)
