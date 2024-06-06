@@ -3,4 +3,4 @@ requests
 schedule
 apscheduler
 python-dotenv
-proxies-tg-wrapper==1.0.1
+proxies-tg-wrapper==1.0.5
