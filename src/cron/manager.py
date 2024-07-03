@@ -16,32 +16,29 @@ def error_handler(server, event):
 
 
 def start_jobs(server, telegram_api_ping, telegram_api_speed):
-    scheduler = BackgroundScheduler(
-        {'apscheduler.job_defaults.max_instances': 3}
-    )
-    scheduler.add_listener(lambda event: error_handler(server,  event),
-                           EVENT_JOB_ERROR)
+    scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 3})
+    scheduler.add_listener(lambda event: error_handler(server, event), EVENT_JOB_ERROR)
 
     job_ping.start_safe(server, telegram_api_ping, False)
-    #job_speed.start_safe(server, telegram_api_speed)
+    job_ping.start_safe(server, telegram_api_ping, True)
+    job_speed.start_safe(server, telegram_api_speed)
 
     # ping
     scheduler.add_job(
         lambda: job_ping.start_safe(server, telegram_api_ping, False),
-        trigger=CronTrigger.from_crontab(Config.cron_expression_ping)
+        trigger=CronTrigger.from_crontab(Config.cron_expression_ping),
     )
 
     # ping disconnected
     scheduler.add_job(
         lambda: job_ping.start_safe(server, telegram_api_ping, True),
-        trigger=CronTrigger.from_crontab(
-            Config.cron_expression_ping_disconnect)
+        trigger=CronTrigger.from_crontab(Config.cron_expression_ping_disconnect),
     )
 
     # speed test
     scheduler.add_job(
         lambda: job_speed.start_safe(server, telegram_api_speed),
-        trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test)
+        trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test),
     )
 
     scheduler.start()
