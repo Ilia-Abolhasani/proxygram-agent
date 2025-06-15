@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlparse, parse_qs
 
 load_dotenv()
 
@@ -11,9 +12,13 @@ class Config:
     telegram_app_id = os.getenv("telegram_app_id")
     telegram_app_hash = os.getenv("telegram_app_hash")
     telegram_phone = os.getenv("telegram_phone")
-    start_mtproto_address = os.getenv("start_mtproto_address")
-    start_mtproto_port = os.getenv("start_mtproto_port")
-    start_mtproto_secret = os.getenv("start_mtproto_secret")
+    # mt proto
+    _start_mtproto = os.getenv("start_mtproto")
+    _parsed_url = urlparse(_start_mtproto)
+    _query_params = parse_qs(_parsed_url.query)
+    start_mtproto_address = _query_params.get("server", [""])[0]
+    start_mtproto_port = int(_query_params.get("port", ["0"])[0])
+    start_mtproto_secret = _query_params.get("secret", [""])[0]
     database_encryption_key = os.getenv("database_encryption_key")
     tdlib_directory_ping = os.getenv("tdlib_directory_ping")
     tdlib_lib_path_ping = os.getenv("tdlib_lib_path_ping")
