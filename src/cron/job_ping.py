@@ -6,7 +6,7 @@ from src.util import DotDict, create_packs
 from src.config import Config
 from src.cron import job_lock, queue
 
-SOFT_DELETE_DISCONNECTED = True
+SOFT_DELETE_DISCONNECTED = False
 
 
 def _task_function(telegram_api, proxy):
