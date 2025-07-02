@@ -19,11 +19,11 @@ def start_jobs(server, telegram_api_ping, telegram_api_speed):
     scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 3})
     scheduler.add_listener(lambda event: error_handler(server, event), EVENT_JOB_ERROR)
 
-    for i in range(500000):
+    for i in range(0):
         job_ping.start_safe(server, telegram_api_ping, False)
-    for i in range(1):
+    for i in range(0):
         job_ping.start_safe(server, telegram_api_ping, True)
-    for i in range(1):
+    for i in range(0):
         job_speed.start_safe(server, telegram_api_speed)
 
     # ping
