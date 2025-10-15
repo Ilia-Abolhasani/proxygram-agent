@@ -19,13 +19,22 @@ def error_handler(server, event):
 def start_jobs(server, telegram_api_ping, telegram_api_speed):
     while True:
         for i in range(50):
-            job_ping.start_safe(server, telegram_api_ping, False)
+            try:
+                job_ping.start_safe(server, telegram_api_ping, False)
+            except Exception as error:
+                print(error)
             time.sleep(1)
         for i in range(10):
-            job_ping.start_safe(server, telegram_api_ping, True)
+            try:
+                job_ping.start_safe(server, telegram_api_ping, True)
+            except Exception as error:
+                print(error)
             time.sleep(1)
         for i in range(1):
-            job_speed.start_safe(server, telegram_api_speed)
+            try:
+                job_speed.start_safe(server, telegram_api_speed)
+            except Exception as error:
+                print(error)
             time.sleep(1)
         time.sleep(5)
 
