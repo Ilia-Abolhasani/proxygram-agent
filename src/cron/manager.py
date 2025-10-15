@@ -4,6 +4,7 @@ from apscheduler.events import EVENT_JOB_ERROR
 import src.cron.job_ping as job_ping
 import src.cron.job_speed as job_speed
 from src.config import Config
+import time
 
 
 def error_handler(server, event):
@@ -16,32 +17,36 @@ def error_handler(server, event):
 
 
 def start_jobs(server, telegram_api_ping, telegram_api_speed):
-    scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 3})
-    scheduler.add_listener(lambda event: error_handler(server, event), EVENT_JOB_ERROR)
+    while True:
+        for i in range(50):
+            job_ping.start_safe(server, telegram_api_ping, False)
+            time.sleep(1)
+        for i in range(10):
+            job_ping.start_safe(server, telegram_api_ping, True)
+            time.sleep(1)
+        for i in range(1):
+            job_speed.start_safe(server, telegram_api_speed)
+            time.sleep(1)
+        time.sleep(5)
 
-    for i in range(0):
-        job_ping.start_safe(server, telegram_api_ping, False)
-    for i in range(0):
-        job_ping.start_safe(server, telegram_api_ping, True)
-    for i in range(0):
-        job_speed.start_safe(server, telegram_api_speed)
+    # scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 3})
+    # scheduler.add_listener(lambda event: error_handler(server, event), EVENT_JOB_ERROR)
+    # # ping
+    # scheduler.add_job(
+    #     lambda: job_ping.start_safe(server, telegram_api_ping, False),
+    #     trigger=CronTrigger.from_crontab(Config.cron_expression_ping),
+    # )
 
-    # ping
-    scheduler.add_job(
-        lambda: job_ping.start_safe(server, telegram_api_ping, False),
-        trigger=CronTrigger.from_crontab(Config.cron_expression_ping),
-    )
+    # # ping disconnected
+    # scheduler.add_job(
+    #     lambda: job_ping.start_safe(server, telegram_api_ping, True),
+    #     trigger=CronTrigger.from_crontab(Config.cron_expression_ping_disconnect),
+    # )
 
-    # ping disconnected
-    scheduler.add_job(
-        lambda: job_ping.start_safe(server, telegram_api_ping, True),
-        trigger=CronTrigger.from_crontab(Config.cron_expression_ping_disconnect),
-    )
+    # # speed test
+    # scheduler.add_job(
+    #     lambda: job_speed.start_safe(server, telegram_api_speed),
+    #     trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test),
+    # )
 
-    # speed test
-    scheduler.add_job(
-        lambda: job_speed.start_safe(server, telegram_api_speed),
-        trigger=CronTrigger.from_crontab(Config.cron_expression_speed_test),
-    )
-
-    scheduler.start()
+    # scheduler.start()
