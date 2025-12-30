@@ -2,11 +2,15 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for TDLib
 RUN apt-get update && apt-get install -y \
     wget \
-    libssl3 \
-    zlib1g \
+    git \
+    build-essential \
+    cmake \
+    gperf \
+    libssl-dev \
+    zlib1g-dev \
     libstdc++6 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -17,14 +21,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Download and extract TDLib pre-built binaries
-RUN wget https://github.com/tdlib/td/releases/download/v1.8.31/tdlib-1.8.31-linux-x86_64.tar.gz && \
-    tar -xzf tdlib-1.8.31-linux-x86_64.tar.gz && \
-    mkdir -p tdlibs/td-agent-ping tdlibs/td-agent-speed && \
-    find . -name "libtdjson.so*" -exec cp {} tdlibs/td-agent-ping/ \; && \
-    find . -name "libtdjson.so*" -exec cp {} tdlibs/td-agent-speed/ \; && \
-    mkdir -p tdlibs/td-agent-ping/td_db tdlibs/td-agent-speed/td_db && \
-    rm -rf tdlib-1.8.31-linux-x86_64.tar.gz usr
+# Build TDLib from source
+RUN git clone https://github.com/tdlib/td.git /tmp/td && \
+    cd /tmp/td && \
+    git checkout v1.8.31 && \
+    mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr/local .. && \
+    cmake --build . --target install -j$(nproc) && \
+    mkdir -p /app/tdlibs/td-agent-ping /app/tdlibs/td-agent-speed && \
+    cp /usr/local/lib/libtdjson.so* /app/tdlibs/td-agent-ping/ && \
+    cp /usr/local/lib/libtdjson.so* /app/tdlibs/td-agent-speed/ && \
+    mkdir -p /app/tdlibs/td-agent-ping/td_db /app/tdlibs/td-agent-speed/td_db && \
+    cd / && rm -rf /tmp/td
 
 # Run the application
 CMD ["python", "run.py"]
