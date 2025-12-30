@@ -24,7 +24,7 @@ COPY . .
 # Build TDLib from source
 RUN git clone https://github.com/tdlib/td.git /tmp/td && \
     cd /tmp/td && \
-    git checkout v1.8.31 && \
+    git checkout master && \
     mkdir build && cd build && \
     cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr/local .. && \
     cmake --build . --target install -j$(nproc) && \
