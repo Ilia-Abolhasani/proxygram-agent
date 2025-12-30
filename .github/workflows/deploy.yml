@@ -16,7 +16,9 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ secrets.APP_ENV }}" > .env
+          cat << 'EOF' > .env
+          ${{ secrets.APP_ENV }}
+          EOF
 
       - name: Stop and remove existing container
         run: |
