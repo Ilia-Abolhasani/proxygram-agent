@@ -17,7 +17,7 @@ jobs:
       - name: Create .env file
         run: |
           cat << 'EOF' > .env
-          ${{ secrets.APP_ENV }}
+          ${{ vars.APP_ENV }}
           EOF
 
       - name: Stop and remove existing container
@@ -36,7 +36,10 @@ jobs:
             --name proxygram-agent \
             --restart unless-stopped \
             --env-file .env \
-            -v proxygram-tdlibs:/app/tdlibs \
+            -v /home/td/tdlib_build:/app/tdlibs/td-agent-ping \
+            -v /home/td/tdlib_buildd:/app/tdlibs/td-agent-speed \
+            -v proxygram-tdlibs-data:/app/tdlibs/td-agent-ping/td_db \
+            -v proxygram-tdlibs-data-speed:/app/tdlibs/td-agent-speed/td_db \
             proxygram-agent:latest
 
       - name: Clean up
