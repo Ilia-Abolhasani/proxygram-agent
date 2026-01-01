@@ -19,10 +19,8 @@ COPY . .
 
 # Create tdlibs directories and placeholder files for volume mounts
 RUN mkdir -p tdlibs/td-agent-ping tdlibs/td-agent-speed && \
-    touch tdlibs/td-agent-ping/libtdjson.so.1.8.59 && \
-    touch tdlibs/td-agent-speed/libtdjson.so.1.8.59 && \
-    ln -s /app/tdlibs/td-agent-ping/libtdjson.so.1.8.59 /app/tdlibs/td-agent-ping/libtdjson.so && \
-    ln -s /app/tdlibs/td-agent-speed/libtdjson.so.1.8.59 /app/tdlibs/td-agent-speed/libtdjson.so && \
+    touch tdlibs/td-agent-ping/libtdjson.so && \
+    touch tdlibs/td-agent-speed/libtdjson.so && \
     mkdir -p tdlibs/td-agent-ping/td_db tdlibs/td-agent-speed/td_db
 
 # Run the application
