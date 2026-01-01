@@ -36,8 +36,8 @@ jobs:
             --name proxygram-agent \
             --restart unless-stopped \
             --env-file .env \
-            -v /home/td/tdlib_build:/app/tdlibs/td-agent-ping \
-            -v /home/td/tdlib_build:/app/tdlibs/td-agent-speed \
+            -v /home/td/tdlib_build/libtdjson.so.1.8.59:/app/tdlibs/td-agent-ping/libtdjson.so.1.8.59:ro \
+            -v /home/td/tdlib_build/libtdjson.so.1.8.59:/app/tdlibs/td-agent-speed/libtdjson.so.1.8.59:ro \
             -v proxygram-tdlibs-data:/app/tdlibs/td-agent-ping/td_db \
             -v proxygram-tdlibs-data-speed:/app/tdlibs/td-agent-speed/td_db \
             proxygram-agent:latest
