@@ -37,7 +37,7 @@ jobs:
             --restart unless-stopped \
             --env-file .env \
             -v /home/td/tdlib_build:/app/tdlibs/td-agent-ping \
-            -v /home/td/tdlib_buildd:/app/tdlibs/td-agent-speed \
+            -v /home/td/tdlib_build:/app/tdlibs/td-agent-speed \
             -v proxygram-tdlibs-data:/app/tdlibs/td-agent-ping/td_db \
             -v proxygram-tdlibs-data-speed:/app/tdlibs/td-agent-speed/td_db \
             proxygram-agent:latest
