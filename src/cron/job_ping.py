@@ -6,7 +6,7 @@ from src.util import DotDict, create_packs
 from src.config import Config
 from src.cron import job_lock, queue
 
-SOFT_DELETE_DISCONNECTED = False
+SOFT_DELETE_DISCONNECTED = True
 
 
 def _task_function(telegram_api, proxy):
@@ -55,10 +55,10 @@ def _start(server, telegram_api, proxies):
                     seconds = result.update["seconds"] * 1000
                 if SOFT_DELETE_DISCONNECTED and seconds == -1:
                     print(f"soft_delete_proxy: {proxy_id}")
-                    server.soft_delete_proxy(proxy_id)
+                    server.delete_proxy(proxy_id)
                 else:
                     reports.append({"proxy_id": proxy_id, "ping": seconds})
-            server.send_ping_report({"reports": reports})
+            # server.send_ping_report({"reports": reports})
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"job-ping packet sent elapsed_time: {elapsed_time}")
