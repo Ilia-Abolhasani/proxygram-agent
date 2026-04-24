@@ -7,10 +7,10 @@ from src.config import Config
 from src.cron import job_lock, queue
 
 SOFT_DELETE_DISCONNECTED = True
+PING_TIMEOUT = 3  # seconds
 
 
 def _task_function(telegram_api, proxy):
-    # print(f"started proxy: {proxy.id}")
     result = telegram_api.ping_proxy(proxy.td_proxy_id)
     return [result, proxy.id]
 
@@ -46,19 +46,24 @@ def _start(server, telegram_api, proxies):
                 if proxy.error:
                     continue
                 futures.append(executor.submit(_task_function, telegram_api, proxy))
-            # Wait for all tasks to complete
-            concurrent.futures.wait(futures)
-            for future in futures:
+            # Wait with timeout
+            done, not_done = concurrent.futures.wait(futures, timeout=PING_TIMEOUT)
+            for future in done:
                 [result, proxy_id] = future.result()
                 seconds = -1
                 if not result.error:
                     seconds = result.update["seconds"] * 1000
                 if SOFT_DELETE_DISCONNECTED and seconds == -1:
                     print(f"soft_delete_proxy: {proxy_id}")
-                    server.delete_proxy(proxy_id)
+                    server.soft_delete_proxy(proxy_id)
                 else:
                     reports.append({"proxy_id": proxy_id, "ping": seconds})
-            # server.send_ping_report({"reports": reports})
+            # Timed out futures = disconnected
+            for future in not_done:
+                future.cancel()
+
+            print(reports)
+            server.send_ping_report({"reports": reports})
             end_time = time.time()
             elapsed_time = end_time - start_time
             print(f"job-ping packet sent elapsed_time: {elapsed_time}")

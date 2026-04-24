@@ -16,9 +16,11 @@ class Config:
     _start_mtproto = os.getenv("start_mtproto")
     _parsed_url = urlparse(_start_mtproto)
     _query_params = parse_qs(_parsed_url.query)
-    start_mtproto_address = _query_params.get("server", [""])[0]
-    start_mtproto_port = int(_query_params.get("port", ["0"])[0])
-    start_mtproto_secret = _query_params.get("secret", [""])[0]
+    start_mtproto_address = _query_params.get("server", ["107.189.28.32"])[0]
+    start_mtproto_port = int(_query_params.get("port", ["443"])[0])
+    start_mtproto_secret = _query_params.get(
+        "secret", ["eebe9ba010e83c95aa690b10c541d1db227777772e676f6f676c652e636f6d"]
+    )[0]
     database_encryption_key = os.getenv("database_encryption_key")
     tdlib_directory_ping = os.getenv("tdlib_directory_ping")
     tdlib_lib_path_ping = os.getenv("tdlib_lib_path_ping")
