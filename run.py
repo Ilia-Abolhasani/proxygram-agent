@@ -1,6 +1,6 @@
 import src
 from src.server import Server
-from proxies_tg_wrapper.api_wrapper import Telegram_API
+from src.proxies_tg_wrapper.api_wrapper import Telegram_API
 from src.cron import manager
 from src.config import Config
 

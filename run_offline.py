@@ -7,7 +7,7 @@ import json
 import concurrent.futures
 import tqdm
 
-from proxies_tg_wrapper.api_wrapper import Telegram_API
+from src.proxies_tg_wrapper.api_wrapper import Telegram_API
 from src.config import Config
 from src.util import DotDict, create_packs
 
