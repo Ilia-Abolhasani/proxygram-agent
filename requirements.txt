@@ -4,4 +4,4 @@ schedule
 apscheduler
 python-dotenv
 python-telegram==0.18.0
-setuptools
+setuptools<81

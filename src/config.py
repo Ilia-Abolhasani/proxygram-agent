@@ -13,6 +13,12 @@ class Config:
     telegram_app_hash = os.getenv("telegram_app_hash")
     telegram_phone = os.getenv("telegram_phone")
     # mt proto
+    use_start_proxy = os.getenv("use_start_proxy", "true").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
     _start_mtproto = os.getenv("start_mtproto")
     _parsed_url = urlparse(_start_mtproto)
     _query_params = parse_qs(_parsed_url.query)
