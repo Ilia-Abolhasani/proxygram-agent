@@ -19,6 +19,7 @@ if __name__ == "__main__":
         Config.start_mtproto_port if Config.use_start_proxy else None,
         Config.start_mtproto_secret if Config.use_start_proxy else None,
     )
+    result = telegram_api_ping.remove_all_proxies()
     telegram_api_ping.set_log_verbose_level(1)
     result = telegram_api_ping.remove_all_proxies()
     # telegram api for speed
@@ -33,6 +34,7 @@ if __name__ == "__main__":
         Config.start_mtproto_port,
         Config.start_mtproto_secret,
     )
+    result = telegram_api_speed.remove_all_proxies()
     telegram_api_speed = telegram_api_speed
     telegram_api_speed.set_log_verbose_level(1)
     result = telegram_api_speed.remove_all_proxies()
