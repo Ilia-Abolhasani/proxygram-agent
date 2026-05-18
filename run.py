@@ -18,26 +18,24 @@ if __name__ == "__main__":
         Config.start_mtproto_address if Config.use_start_proxy else None,
         Config.start_mtproto_port if Config.use_start_proxy else None,
         Config.start_mtproto_secret if Config.use_start_proxy else None,
+        skip_login=True,
     )
     result = telegram_api_ping.remove_all_proxies()
-    telegram_api_ping.set_log_verbose_level(1)
-    result = telegram_api_ping.remove_all_proxies()
+    telegram_api_ping.set_log_verbose_level(1)    
     # telegram api for speed
     telegram_api_speed = Telegram_API(
         Config.telegram_app_id,
         Config.telegram_app_hash,
         Config.telegram_phone,
         Config.database_encryption_key,
-        Config.tdlib_directory_ping,
-        Config.tdlib_lib_path_ping,
-        Config.start_mtproto_address,
-        Config.start_mtproto_port,
-        Config.start_mtproto_secret,
+        Config.tdlib_directory_speed,
+        Config.tdlib_lib_path_speed,
+        Config.start_mtproto_address if Config.use_start_proxy else None,
+        Config.start_mtproto_port if Config.use_start_proxy else None,
+        Config.start_mtproto_secret if Config.use_start_proxy else None,
     )
     result = telegram_api_speed.remove_all_proxies()
-    telegram_api_speed = telegram_api_speed
-    telegram_api_speed.set_log_verbose_level(1)
-    result = telegram_api_speed.remove_all_proxies()
+    telegram_api_speed.set_log_verbose_level(1)    
     print("strat manager.")
     manager.start_jobs(server, telegram_api_ping, telegram_api_speed)
     telegram_api_ping.idle()

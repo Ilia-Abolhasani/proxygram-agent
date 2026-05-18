@@ -144,13 +144,13 @@ class Telegram_API:
         )
         return result
 
-    def add_proxy(self, server, port, secret):
+    def add_proxy(self, server, port, secret, enable=True):
         return self._call(
             "addProxy",
             {
                 "server": server,
                 "port": port,
-                "enable": True,
+                "enable": enable,
                 "type": {"@type": "proxyTypeMtproto", "secret": secret},
             },
         )
