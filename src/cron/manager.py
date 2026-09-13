@@ -19,6 +19,7 @@ def error_handler(server, event):
 def start_jobs(server, telegram_api):
     while True:
         job_ping.start_safe(server, telegram_api, False)        
+        job_speed.start_safe(server, telegram_api)
     scheduler = BackgroundScheduler({"apscheduler.job_defaults.max_instances": 3})
     scheduler.add_listener(lambda event: error_handler(server, event), EVENT_JOB_ERROR)    
     # Schedules come from .env (cron_expression_*), which was already being
