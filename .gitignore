@@ -13,4 +13,4 @@ MANIFEST
 .DS_Store
 .vscode
 .env
-/tdlib/td-agent
+/tdlib/
