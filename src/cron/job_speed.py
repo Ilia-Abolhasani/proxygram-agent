@@ -23,6 +23,12 @@ def _remove_partial_download(result):
 
 
 def download_spped(telegram_api):
+    # Not dead code: TDLib only serves get_message() for chats already in its
+    # local database. Resolving the channel by username and pulling a bit of
+    # history is what puts it there; on a fresh TDLib data dir, skipping this
+    # makes get_message() fail with "Chat not found".
+    chat_id = telegram_api.search_public_chat(Config.download_username)
+    telegram_api.channel_history(chat_id, 5, None)
     result = telegram_api.get_message(
         int(Config.download_chat_id),
         int(Config.download_message_id))
