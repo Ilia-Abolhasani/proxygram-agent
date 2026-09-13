@@ -7,11 +7,12 @@ from src.util import DotDict, create_packs
 from src.config import Config
 from src.cron import job_lock, queue
 
-SOFT_DELETE_DISCONNECTED = False
+SOFT_DELETE_DISCONNECTED = True
 PER_PROXY_BUDGET = 5.0  # total seconds allowed per proxy before timing out
-SOFT_DELETE_WORKERS = 8
+SOFT_DELETE_CHUNK_SIZE = 50  # proxy ids per soft-delete request
 TCP_PROBE_TIMEOUT = 1.5  # seconds for TCP connect probe
 TCP_PROBE_CONCURRENCY = 500  # max concurrent TCP probes
+RETRY_PAUSE = 0.05  # seconds between ping retries within a proxy's budget
 
 
 async def _tcp_probe_one(server, port, sem):
@@ -62,15 +63,28 @@ def _task_function(telegram_api, proxy):
         if not result.error:
             samples.append(result.update["seconds"] * 1000)
             break
+        # Retrying only makes sense for a timeout. Any other error comes back
+        # instantly, and looping on it hammered TDLib for the whole budget.
+        if (result.error_info or {}).get("message") != "Timeout":
+            break
+        # A real timeout already consumed `remaining`; this only bounds the
+        # loop if it ever returns early.
+        time.sleep(RETRY_PAUSE)
     return samples, proxy.id
 
 
 def _batch_soft_delete(server, proxy_ids):
+    """Soft-delete proxies in a few batched requests.
+
+    One request per proxy meant thousands of concurrent requests (and twice as
+    many database sessions) per ping round, which is what overloaded the server.
+    """
     if not proxy_ids:
         return
     print(f"soft_delete batch ({len(proxy_ids)} proxies)")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=SOFT_DELETE_WORKERS) as ex:
-        list(ex.map(server.soft_delete_proxy, proxy_ids))
+    for chunk in create_packs(proxy_ids, SOFT_DELETE_CHUNK_SIZE):
+        print(f"soft_delete chunk ({len(chunk)} proxies)")
+        server.soft_delete_proxies(chunk)
 
 
 def _start(server, telegram_api, proxies):
@@ -120,7 +134,8 @@ def _start(server, telegram_api, proxies):
                     reports.append({"proxy_id": proxy_id, "ping": ping_ms})
 
         print(reports)
-        server.send_ping_report({"reports": reports})
+        if reports and server.send_ping_report({"reports": reports}) is None:
+            print(f"WARNING: {len(reports)} ping report(s) were not accepted")
         _batch_soft_delete(server, disconnected_ids)
         elapsed_time = time.time() - start_time
         print(f"job-ping packet sent elapsed_time: {elapsed_time}")
@@ -145,8 +160,11 @@ def _start_ping(server, telegram_api, disconnect):
     )
     # Report TCP-unreachable as ping=-1 so the server can track disconnect state
     if dead:
-        reports = [{"proxy_id": p["id"], "ping": -1} for p in dead]
-        server.send_ping_report({"reports": reports})
+        if SOFT_DELETE_DISCONNECTED:
+            _batch_soft_delete(server, [p["id"] for p in dead])
+        else:
+            reports = [{"proxy_id": p["id"], "ping": -1} for p in dead]
+            server.send_ping_report({"reports": reports})
 
     # Stage 2: real MTProto pingProxy via TDLib (only on TCP-alive candidates)
     if candidates:
@@ -155,19 +173,14 @@ def _start_ping(server, telegram_api, disconnect):
 
 def start_safe(server, telegram_api, disconnect):
     global job_lock, queue
-    if disconnect:
-        if queue.ping_disconnect:
-            return
-        queue.ping_disconnect = True
+    key = "ping_disconnect" if disconnect else "ping_connect"
+    if queue[key]:
+        return
+    queue[key] = True
+    try:
+        # try/finally: without it a single exception left the flag on True and
+        # every later run returned at the check above until a restart.
         with job_lock:
             _start_ping(server, telegram_api, disconnect)
-        queue.ping_disconnect = False
-        return
-    else:
-        if queue.ping_connect:
-            return
-        queue.ping_connect = True
-        with job_lock:
-            _start_ping(server, telegram_api, disconnect)
-        queue.ping_connect = False
-        return
+    finally:
+        queue[key] = False

@@ -18,10 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Create tdlibs directories and placeholder files for volume mounts
-RUN mkdir -p tdlibs/td-agent-ping tdlibs/td-agent-speed && \
-    touch tdlibs/td-agent-ping/libtdjson.so && \
-    touch tdlibs/td-agent-speed/libtdjson.so && \
-    mkdir -p tdlibs/td-agent-ping/td_db tdlibs/td-agent-speed/td_db
+RUN mkdir -p tdlibs/td-agent/td_db && \
+    touch tdlibs/td-agent/libtdjson.so
 
 # Run the application
 CMD ["python", "run.py"]

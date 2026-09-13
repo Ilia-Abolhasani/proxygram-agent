@@ -73,7 +73,14 @@ class Telegram_API:
             self.tg.authorization_state = self.tg._wait_authorization_result(result)
 
     def __del__(self):
-        self.tg.stop()
+        # __init__ can raise before self.tg exists, and then __del__ used to
+        # raise AttributeError during garbage collection.
+        tg = getattr(self, "tg", None)
+        if tg is not None:
+            try:
+                tg.stop()
+            except Exception:
+                pass
 
     def _call(self, method_name, params, timeout=None):
         result = self.tg.call_method(method_name=method_name, params=params)

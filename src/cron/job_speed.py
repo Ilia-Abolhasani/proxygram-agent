@@ -10,11 +10,19 @@ from src.cron import job_lock, queue
 from src.config import Config
 
 
+def _remove_partial_download(result):
+    try:
+        path = ((result.update or {}).get("local") or {}).get("path")
+    except Exception:
+        path = None
+    if path and os.path.exists(path):
+        try:
+            os.remove(path)
+        except OSError as error:
+            print(f"could not remove partial download {path}: {error}")
+
+
 def download_spped(telegram_api):
-    # todo should remove in feature
-    chat_id = telegram_api.search_public_chat(Config.download_username)
-    mess, last_id = telegram_api.channel_history(chat_id, 5, None)
-    #
     result = telegram_api.get_message(
         int(Config.download_chat_id),
         int(Config.download_message_id))
@@ -36,8 +44,10 @@ def download_spped(telegram_api):
         try:
             result = future.result(timeout=Config.download_timeout)
         except concurrent.futures.TimeoutError:
-            telegram_api.cancel_download_file(file_id, False)
-            # todo we need to remove download
+            cancelled = telegram_api.cancel_download_file(file_id, False)
+            # Whatever was downloaded before the timeout stays on disk unless
+            # it is removed here; on an hourly agent that fills the volume.
+            _remove_partial_download(cancelled)
             return 0
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -78,7 +88,10 @@ def _start(server, telegram_api, proxies):
             report['speed'] = speed
             report['ping'] = seconds
             report_list.append(report)
-        server.send_speed_report({"reports": report_list})
+        if report_list and server.send_speed_report(
+            {"reports": report_list}
+        ) is None:
+            print(f"WARNING: {len(report_list)} speed report(s) were not accepted")
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(f"job-speed packet sent elapsed_time: {elapsed_time}")
@@ -106,8 +119,8 @@ def start_safe(server, telegram_api):
         return
     queue.speed_test = True
     try:
-        _start_speed(server, telegram_api)
-    except Exception as error:
+        # ping and speed share one TDLib instance -> never run them concurrently
+        with job_lock:
+            _start_speed(server, telegram_api)
+    finally:
         queue.speed_test = False
-        raise error
-    queue.speed_test = False

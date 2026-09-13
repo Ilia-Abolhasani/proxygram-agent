@@ -1,8 +1,17 @@
 import os
+import time
+import threading
 import requests
 from datetime import datetime, timezone
 import hashlib
 from src.config import Config
+
+DEFAULT_TIMEOUT = 5
+BATCH_TIMEOUT = 60
+# A failing request used to fire off a log request of its own. When the server
+# is already saturated that doubles the load it is failing under, so logs are
+# rate limited and the suppressed ones are only counted.
+LOG_MIN_INTERVAL = 30
 
 
 class Server:
@@ -10,6 +19,9 @@ class Server:
         self.base_url = Config.server_url
         self.agent_id = Config.agent_id
         self.agent_secret = Config.agent_secret
+        self._log_lock = threading.Lock()
+        self._log_last_sent = 0.0
+        self._log_suppressed = 0
 
     def _create_headers(self):
         timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
@@ -19,12 +31,12 @@ class Server:
         headers = {"X-Request-Time": timestamp, "X-Hashed-Timestamp": hashed_timestamp}
         return headers
 
-    def _get(self, url, query, sendLog=True):
+    def _get(self, url, query, sendLog=True, timeout=DEFAULT_TIMEOUT):
         headers = self._create_headers()
         response = None
         try:
             response = requests.get(
-                self.base_url + url, params=query, headers=headers, timeout=5
+                self.base_url + url, params=query, headers=headers, timeout=timeout
             )
             if response.status_code == 200:
                 data = response.json()
@@ -42,12 +54,12 @@ class Server:
                 self.send_log(msg)
         return None
 
-    def _post(self, url, query, body, sendLog=True):
+    def _post(self, url, query, body, sendLog=True, timeout=DEFAULT_TIMEOUT):
         headers = self._create_headers()
         response = None
         try:
             response = requests.post(
-                self.base_url + url, params=query, json=body, headers=headers, timeout=5
+                self.base_url + url, params=query, json=body, headers=headers, timeout=timeout
             )
             if response.status_code == 201 or response.status_code == 200:
                 data = response.json()
@@ -67,12 +79,12 @@ class Server:
                 self.send_log(msg)
         return None
 
-    def _update(self, url, query, body, sendLog=True):
+    def _update(self, url, query, body, sendLog=True, timeout=DEFAULT_TIMEOUT):
         headers = self._create_headers()
         response = None
         try:
             response = requests.put(
-                self.base_url + url, params=query, json=body, headers=headers, timeout=5
+                self.base_url + url, params=query, json=body, headers=headers, timeout=timeout
             )
             if response.status_code == 200:
                 data = response.json()
@@ -92,12 +104,12 @@ class Server:
                 self.send_log(msg)
         return None
 
-    def _delete(self, url, query, sendLog=True):
+    def _delete(self, url, query, sendLog=True, timeout=DEFAULT_TIMEOUT):
         headers = self._create_headers()
         response = None
         try:
             response = requests.delete(
-                self.base_url + url, params=query, headers=headers, timeout=5
+                self.base_url + url, params=query, headers=headers, timeout=timeout
             )
             if (
                 response.status_code == 204
@@ -143,7 +155,27 @@ class Server:
         query = {}
         return self._delete(f"/api/{self.agent_id}/proxy/delete/soft/{proxy_id}", query)
 
+    def soft_delete_proxies(self, proxy_ids):
+        query = {}
+        body = {"proxy_ids": list(proxy_ids)}
+        return self._post(
+            f"/api/{self.agent_id}/proxy/delete/soft",
+            query,
+            body,
+            timeout=BATCH_TIMEOUT,
+        )
+
     def send_log(self, message):
+        with self._log_lock:
+            now = time.monotonic()
+            if now - self._log_last_sent < LOG_MIN_INTERVAL:
+                self._log_suppressed += 1
+                return None
+            suppressed = self._log_suppressed
+            self._log_suppressed = 0
+            self._log_last_sent = now
+        if suppressed:
+            message = f"[{suppressed} similar log(s) suppressed]\n{message}"
         query = {}
         body = {"message": message}
         return self._post(f"/api/{self.agent_id}/log/recive", query, body, False)
